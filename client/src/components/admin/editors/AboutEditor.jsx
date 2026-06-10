@@ -7,8 +7,14 @@ const AboutEditor = () => {
   const { authFetch } = useAuth();
   const { portfolio, fetchPortfolio } = usePortfolio();
   const [form, setForm] = useState(null);
-  const [loading, setLoading] = useState(false);
   const { toast, showToast } = useToast();
+  const [loadingStates, setLoadingStates] = useState({
+    bio: false,
+    skills: false,
+    tools: false,
+    timeline: false,
+    quickInfo: false,
+  });
 
   useEffect(() => {
     if (portfolio?.about) setForm({ ...portfolio.about });
@@ -48,14 +54,25 @@ const AboutEditor = () => {
     setForm(p => ({ ...p, quickInfo: parsed }));
   };
 
-  const handleSave = async () => {
-    setLoading(true);
+  const handleSaveField = async (fieldsPayload, successMsg, key) => {
+    setLoadingStates(prev => ({ ...prev, [key]: true }));
     try {
-      const res = await authFetch('/api/portfolio/about', { method: 'PUT', body: JSON.stringify(form) });
+      const res = await authFetch('/api/portfolio/about', {
+        method: 'PUT',
+        body: JSON.stringify(fieldsPayload),
+      });
       const data = await res.json();
-      if (data.success) { showToast('About section saved!'); fetchPortfolio(); }
-    } catch { showToast('Save failed.'); }
-    finally { setLoading(false); }
+      if (data.success) {
+        showToast(successMsg);
+        fetchPortfolio();
+      } else {
+        showToast(data.message || 'Save failed.');
+      }
+    } catch {
+      showToast('Save failed.');
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [key]: false }));
+    }
   };
 
   if (!form) return <div className="text-gray-500 dark:text-gray-500 text-sm">Loading...</div>;
@@ -65,16 +82,31 @@ const AboutEditor = () => {
       <SectionHeader title="About Section" subtitle="Bio, skills, tools, timeline edit karo" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" /></svg>} />
 
       <div className="space-y-6">
-        {/* Bio */}
+        {/* Bio Card */}
         <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] space-y-4">
-          <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Biography</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Biography</h3>
+            <SaveButton 
+              onClick={() => handleSaveField({ bio: form.bio, bio2: form.bio2, bio3: form.bio3 }, 'Biography saved!', 'bio')} 
+              loading={loadingStates.bio} 
+              label="Save Biography"
+            />
+          </div>
           <AdminTextarea label="Bio Paragraph 1" value={form.bio} onChange={(v) => updateField('bio', v)} rows={3} />
           <AdminTextarea label="Bio Paragraph 2" value={form.bio2} onChange={(v) => updateField('bio2', v)} rows={3} />
           <AdminTextarea label="Bio Paragraph 3" value={form.bio3} onChange={(v) => updateField('bio3', v)} rows={3} />
         </div>
 
-        {/* Skills */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
+        {/* Skills Card */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Skills</h3>
+            <SaveButton 
+              onClick={() => handleSaveField({ skills: form.skills }, 'Skills saved!', 'skills')} 
+              loading={loadingStates.skills} 
+              label="Save Skills"
+            />
+          </div>
           <AdminTextarea
             label="Skills — format: name|level(0-100)|gradient-color (one per line)"
             value={form.skills?.map(s => `${s.name}|${s.level}|${s.color}`).join('\n') || ''}
@@ -84,8 +116,16 @@ const AboutEditor = () => {
           />
         </div>
 
-        {/* Tools */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
+        {/* Tools Card */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Tools</h3>
+            <SaveButton 
+              onClick={() => handleSaveField({ tools: form.tools }, 'Tools saved!', 'tools')} 
+              loading={loadingStates.tools} 
+              label="Save Tools"
+            />
+          </div>
           <AdminTextarea
             label="Tools — format: name|emoji|description (one per line)"
             value={form.tools?.map(t => `${t.name}|${t.icon}|${t.desc}`).join('\n') || ''}
@@ -95,8 +135,16 @@ const AboutEditor = () => {
           />
         </div>
 
-        {/* Timeline */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
+        {/* Timeline Card */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Journey Timeline</h3>
+            <SaveButton 
+              onClick={() => handleSaveField({ timeline: form.timeline }, 'Journey timeline saved!', 'timeline')} 
+              loading={loadingStates.timeline} 
+              label="Save Timeline"
+            />
+          </div>
           <AdminTextarea
             label="Journey Timeline — format: year (line1), title (line2), desc (line3), then blank line between entries"
             value={form.timeline?.map(t => `${t.year}\n${t.title}\n${t.desc}`).join('\n\n') || ''}
@@ -106,8 +154,16 @@ const AboutEditor = () => {
           />
         </div>
 
-        {/* Quick Info */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
+        {/* Quick Info Card */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Quick Info Cards</h3>
+            <SaveButton 
+              onClick={() => handleSaveField({ quickInfo: form.quickInfo }, 'Quick info saved!', 'quickInfo')} 
+              loading={loadingStates.quickInfo} 
+              label="Save Quick Info"
+            />
+          </div>
           <AdminTextarea
             label="Quick Info Cards — format: label|value|emoji (one per line)"
             value={form.quickInfo?.map(q => `${q.label}|${q.value}|${q.icon}`).join('\n') || ''}
@@ -118,9 +174,6 @@ const AboutEditor = () => {
         </div>
       </div>
 
-      <div className="flex justify-end mt-6">
-        <SaveButton onClick={handleSave} loading={loading} />
-      </div>
       {toast && <SuccessToast message={toast} onClose={() => {}} />}
     </div>
   );

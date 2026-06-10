@@ -8,7 +8,8 @@ const NavbarEditor = () => {
   const { portfolio, fetchPortfolio } = usePortfolio();
   const [brandName, setBrandName] = useState('');
   const [links, setLinks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loadingBrand, setLoadingBrand] = useState(false);
+  const [loadingLinks, setLoadingLinks] = useState(false);
   const { toast, showToast } = useToast();
 
   useEffect(() => {
@@ -18,17 +19,30 @@ const NavbarEditor = () => {
     }
   }, [portfolio]);
 
-  const handleSave = async () => {
-    setLoading(true);
+  const handleSaveBrand = async () => {
+    setLoadingBrand(true);
     try {
       const res = await authFetch('/api/portfolio/navbar', {
         method: 'PUT',
-        body: JSON.stringify({ brandName, links }),
+        body: JSON.stringify({ brandName }),
       });
       const data = await res.json();
-      if (data.success) { showToast('Navbar updated!'); fetchPortfolio(); }
+      if (data.success) { showToast('Brand Name updated!'); fetchPortfolio(); }
     } catch { showToast('Save failed.'); }
-    finally { setLoading(false); }
+    finally { setLoadingBrand(false); }
+  };
+
+  const handleSaveLinks = async () => {
+    setLoadingLinks(true);
+    try {
+      const res = await authFetch('/api/portfolio/navbar', {
+        method: 'PUT',
+        body: JSON.stringify({ links }),
+      });
+      const data = await res.json();
+      if (data.success) { showToast('Navigation Links updated!'); fetchPortfolio(); }
+    } catch { showToast('Save failed.'); }
+    finally { setLoadingLinks(false); }
   };
 
   return (
@@ -37,7 +51,11 @@ const NavbarEditor = () => {
 
       <div className="space-y-6">
         {/* Brand Name */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
+        <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Brand Logo</h3>
+            <SaveButton onClick={handleSaveBrand} loading={loadingBrand} label="Save Brand Name" />
+          </div>
           <AdminInput label="Brand Name (Logo Text)" value={brandName} onChange={setBrandName} placeholder="Shivam" />
         </div>
 
@@ -45,7 +63,7 @@ const NavbarEditor = () => {
         <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-gray-900 dark:text-white font-semibold text-sm">Navigation Links</h3>
-            <span className="text-gray-500 dark:text-gray-500 text-xs">Link ka naam aur anchor ID same hona chahiye</span>
+            <SaveButton onClick={handleSaveLinks} loading={loadingLinks} label="Save Links" />
           </div>
           <div className="space-y-2 mb-4">
             {links.map((link, i) => (
@@ -74,9 +92,6 @@ const NavbarEditor = () => {
         </div>
       </div>
 
-      <div className="flex justify-end mt-6">
-        <SaveButton onClick={handleSave} loading={loading} />
-      </div>
       {toast && <SuccessToast message={toast} onClose={() => {}} />}
     </div>
   );

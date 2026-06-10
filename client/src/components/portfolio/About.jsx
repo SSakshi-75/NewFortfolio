@@ -13,44 +13,13 @@ const About = () => {
     { id: 'tools', label: 'Tools' },
   ];
 
-  const skills = about?.skills?.length ? about.skills : [
-    { name: 'React / Next.js', level: 90, color: 'from-blue-500 to-cyan-400' },
-    { name: 'JavaScript (ES6+) / Core Java', level: 88, color: 'from-yellow-400 to-orange-400' },
-    { name: 'Node.js / Express', level: 88, color: 'from-green-400 to-emerald-500' },
-    { name: 'MongoDB / MySQL / Redis', level: 82, color: 'from-purple-400 to-pink-400' },
-    { name: 'AWS EC2 / ELB / ASG / Docker', level: 75, color: 'from-orange-400 to-amber-400' },
-    { name: 'JWT / OAuth 2.0 / RBAC', level: 85, color: 'from-cyan-400 to-blue-500' },
-  ];
-
-  const tools = about?.tools?.length ? about.tools : [
-    { name: 'VS Code', icon: '💻', desc: 'Primary IDE' },
-    { name: 'Figma', icon: '🎨', desc: 'UI/UX Design' },
-    { name: 'Postman', icon: '📮', desc: 'API Testing' },
-    { name: 'GitHub', icon: '🐙', desc: 'Version Control' },
-    { name: 'AWS Console', icon: '☁️', desc: 'Cloud Deployment' },
-    { name: 'Docker', icon: '🐳', desc: 'Containerization' },
-    { name: 'Render / Vercel', icon: '▲', desc: 'Hosting' },
-    { name: 'Gemini API', icon: '🤖', desc: 'AI Integration' },
-  ];
-
-  const timeline = about?.timeline?.length ? about.timeline : [
-    { year: 'Jan 2026', title: 'ERP Operations Assistant', desc: 'Administered academic ERP system at Institute of Technology and Management handling 1,000+ student records with 99% data integrity.' },
-    { year: 'May 2026', title: 'Cloudonix – Cloud Media Platform', desc: 'Full-stack cloud media management platform with Redis caching (40% load reduction) and JWT + RBAC security.' },
-    { year: 'Nov 2025', title: 'NPM Author – crt-server', desc: 'Authored and maintain a Node.js CLI package with 1,400+ weekly active users; auto-scaffolds production-ready backend architecture.' },
-  ];
-
-  const quickInfo = about?.quickInfo?.length ? about.quickInfo : [
-    { label: 'Name', value: 'Shivam Pandey', icon: '👤' },
-    { label: 'Location', value: 'Gorakhpur, UP, India', icon: '📍' },
-    { label: 'Experience', value: '1+ Year', icon: '💼' },
-    { label: 'Availability', value: 'Open to Work', icon: '✅' },
-    { label: 'Education', value: 'BCA – Computer Science', icon: '🎓' },
-    { label: 'Contact', value: '+91-6386000621', icon: '📞' },
-  ];
-
-  const bio = about?.bio || "Hello! I'm Shivam Pandey, a Full-Stack Developer based in Gorakhpur, India. I specialize in building production-grade web applications using the MERN stack (MongoDB, Express.js, React.js, Node.js).";
-  const bio2 = about?.bio2 || "I'm an NPM Verified Open Source Contributor maintaining two published packages with 1,400+ weekly active users. I have demonstrated expertise in RESTful API design, JWT & OAuth 2.0 authentication, Redis caching (40% load reduction), role-based access control (RBAC), and microservices architecture.";
-  const bio3 = about?.bio3 || "I have hands-on cloud deployment experience with AWS EC2, Elastic Load Balancer (ELB), Auto Scaling Group (ASG), and Docker. Proficient in AI-assisted development using Generative AI, Prompt Engineering, and Cursor AI.";
+  const skills = about?.skills || [];
+  const tools = about?.tools || [];
+  const timeline = about?.timeline || [];
+  const quickInfo = about?.quickInfo || [];
+  const bio = about?.bio || "";
+  const bio2 = about?.bio2 || "";
+  const bio3 = about?.bio3 || "";
 
   const profilePhoto = portfolio?.hero?.profilePhoto;
 
@@ -191,24 +160,7 @@ const About = () => {
                   </div>
                 ))}
 
-                {/* Skill Categories */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
-                  {[
-                    { category: 'Frontend', items: ['React', 'Next.js', 'Tailwind CSS', 'JavaScript', 'HTML5/CSS3'], color: 'blue' },
-                    { category: 'Backend', items: ['Node.js', 'Express', 'REST API', 'GraphQL', 'Socket.io'], color: 'green' },
-                    { category: 'Database', items: ['MongoDB', 'MySQL', 'Redis', 'Mongoose ODM'], color: 'purple' },
-                    { category: 'Cloud & DevOps', items: ['AWS EC2', 'ELB', 'ASG', 'Docker', 'Vercel', 'Render'], color: 'orange' },
-                  ].map((cat) => (
-                    <div key={cat.category} className="p-4 rounded-xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] hover:bg-gray-100 dark:hover:bg-white/[0.04] transition-all duration-300">
-                      <h4 className="text-white text-sm font-semibold mb-2">{cat.category}</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {cat.items.map((item) => (
-                          <span key={item} className="px-2.5 py-1 rounded-md bg-gray-100 dark:bg-white/[0.04] text-gray-600 dark:text-gray-400 text-xs border border-white/[0.06]">{item}</span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+
               </div>
             )}
 

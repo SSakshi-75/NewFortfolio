@@ -1,83 +1,17 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-
-// Static fallback projects (same as Projects.jsx)
-const staticProjects = [
-  {
-    id: 'static-0',
-    title: 'Cloudonix',
-    description: 'Full-stack cloud media management platform supporting image, video, and PDF upload with automatic URL generation, processing 500+ assets with third-party API integration.',
-    longDescription: 'Cloudonix is a full-stack cloud media management platform built with the MERN stack. It supports image, video, and PDF uploads with automatic URL generation via Cloudflare Workers. The system processes 500+ assets and integrates Redis for caching to ensure fast retrieval. Secure authentication via JWT access + refresh tokens protects all routes.',
-    tags: ['React.js', 'Node.js', 'MongoDB', 'Redis', 'JWT', 'REST API', 'Cloudflare', 'Render'],
-    category: 'Full Stack', accent: '#60A5FA',
-    github: 'https://github.com/Shivam-75', live: '#', period: 'May – Jun 2026',
-    location: '', date: '', screenshots: [],
-  },
-  {
-    id: 'static-1',
-    title: 'Gate Entry System – Parampara Fest',
-    description: 'QR-code-based gate entry system with 2-factor verification and 3-tier RBAC panels (Admin, Teacher, Student) deployed on AWS EC2 with Elastic Load Balancer.',
-    longDescription: 'A production-level gate entry system built for the Parampara college fest. Implements QR-code-based 2-factor verification with a 3-tier RBAC system (Admin, Teacher, Student). Deployed on AWS EC2 with Elastic Load Balancer and Auto Scaling Group to handle 7,000+ concurrent student verifications reliably.',
-    tags: ['MERN Stack', 'JWT', 'RBAC', 'AWS EC2', 'ELB', 'ASG'],
-    category: 'Full Stack', accent: '#A78BFA',
-    github: 'https://github.com/Shivam-75', live: '#', period: 'Feb – Mar 2026',
-    location: '', date: '', screenshots: [],
-  },
-  {
-    id: 'static-2',
-    title: 'Food Token System – Parampara Fest',
-    description: 'QR-based digital food token system eliminating 100% duplicate meal access for 7,000+ students across 3 vendor stations.',
-    longDescription: 'A digital food token system that replaced physical tokens at the Parampara college festival. QR-based distribution eliminated 100% duplicate meal access. Managed real-time meal distribution across 3 vendor stations for 7,000+ students. The 3-panel RBAC system (Admin, Vendor, Student) reduced manual processing time by 60%.',
-    tags: ['MERN Stack', 'JWT', 'RBAC', 'AWS EC2', 'ELB', 'ASG'],
-    category: 'Full Stack', accent: '#34D399',
-    github: 'https://github.com/Shivam-75', live: '#', period: 'Feb – Mar 2026',
-    location: '', date: '', screenshots: [],
-  },
-  {
-    id: 'static-3',
-    title: 'SaveLife & MediaAssist AI',
-    description: 'End-to-end blood bank management system with AI-powered donor-recipient matching algorithm via Gemini API.',
-    longDescription: 'SaveLife is a comprehensive blood bank management system with an AI-powered donor-recipient matching algorithm using the Gemini API, reducing manual matching time by 70%. It features real-time blood inventory tracking with JWT-secured 3-role authentication (Admin, Donor, Hospital). A ChatGPT-powered Medicine Assistant helps users with health suggestions.',
-    tags: ['MERN Stack', 'JWT', 'Gemini API', 'REST API', 'MongoDB'],
-    category: 'Full Stack', accent: '#FB7185',
-    github: 'https://github.com/Shivam-75', live: '#', period: 'Nov – Dec 2025',
-    location: 'Gorakhpur', date: '25 / 10 / 2025', screenshots: [],
-  },
-  {
-    id: 'static-4',
-    title: 'npm i cloudonix',
-    description: 'Published open-source Node.js SDK abstracting cloud media upload and URL generation APIs.',
-    longDescription: 'An open-source Node.js SDK that abstracts cloud media upload and URL generation APIs into a simple interface. Published on NPM and earned the NPM Verified Contributor badge. The package has active community adoption with users across multiple projects leveraging it for media management workflows.',
-    tags: ['Node.js', 'Cloud SDK', 'REST API Wrapper', 'Open Source', 'NPM'],
-    category: 'Backend', accent: '#FB923C',
-    github: 'https://github.com/Shivam-75', live: 'https://www.npmjs.com/package/cloudonix', period: 'May – Jun 2026',
-    location: '', date: '', screenshots: [],
-  },
-  {
-    id: 'static-5',
-    title: 'npx crt-server',
-    description: 'Node.js CLI package with 1,400+ weekly active users; auto-scaffolds production-ready backend architecture.',
-    longDescription: 'A Node.js CLI tool that auto-scaffolds a production-ready backend with cluster mode, multithreading, and configurable middleware stack in seconds. Authored and actively maintained, the package has grown to 1,400+ weekly active users. It generates Express.js backend boilerplate with JWT auth, MongoDB setup, and structured folder architecture.',
-    tags: ['Node.js', 'CLI Tool', 'Open Source', 'NPM', 'Author & Maintainer'],
-    category: 'Backend', accent: '#38BDF8',
-    github: 'https://github.com/Shivam-75', live: 'https://www.npmjs.com/package/crt-server', period: 'Nov – Dec 2025',
-    location: '', date: '', screenshots: [],
-  },
-];
 
 const ProjectDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { portfolio } = usePortfolio();
+  const [activeImage, setActiveImage] = useState(null);
 
-  // Find project — first check DB projects, then static
+  // Find project — check DB projects
   let project = null;
   if (portfolio?.projects?.length) {
     project = portfolio.projects.find((p) => p._id === id || String(p._id) === id);
-  }
-  if (!project) {
-    // Check static by id string or index
-    project = staticProjects.find((p) => p.id === id) || staticProjects[parseInt(id, 10)];
   }
 
   if (!project) {
@@ -140,8 +74,8 @@ const ProjectDetailPage = () => {
 
         {/* Cover Image */}
         {project.coverImage && (
-          <div className="mb-10 rounded-2xl overflow-hidden border border-white/[0.06] shadow-2xl">
-            <img src={project.coverImage} alt={project.title} className="w-full h-auto object-cover" />
+          <div className="mb-10 rounded-2xl overflow-hidden border border-white/[0.06] shadow-2xl max-h-[380px] w-full flex items-center justify-center bg-[#070b14]">
+            <img src={project.coverImage} alt={project.title} className="w-full h-full object-cover object-top" />
           </div>
         )}
 
@@ -233,28 +167,54 @@ const ProjectDetailPage = () => {
               <span className="w-1 h-6 rounded-full bg-gradient-to-b from-purple-400 to-pink-400 inline-block" />
               Screenshots
             </h2>
-            <div className="space-y-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {screenshots.map((shot, index) => {
                 const url = typeof shot === 'string' ? shot : shot?.url;
                 const caption = typeof shot === 'string' ? '' : shot?.caption;
                 if (!url) return null;
                 return (
-                  <div key={index} className="group">
-                    <div className="rounded-2xl overflow-hidden border border-white/[0.06] shadow-xl hover:border-white/[0.1] transition-all duration-300">
+                  <div key={index} className="group bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden hover:border-white/[0.1] hover:shadow-lg transition-all duration-300">
+                    <div 
+                      className="overflow-hidden w-full h-40 flex items-center justify-center cursor-pointer"
+                      onClick={() => setActiveImage({ url, caption })}
+                    >
                       <img
                         src={url}
                         alt={caption || `Screenshot ${index + 1}`}
-                        className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
-                    {caption && (
-                      <p className="text-gray-400 text-sm mt-3 text-center italic px-4">
-                        {caption}
-                      </p>
-                    )}
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Lightbox Modal */}
+        {activeImage && (
+          <div 
+            className="fixed inset-0 z-[120] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 cursor-zoom-out"
+            onClick={() => setActiveImage(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer text-xl"
+              onClick={() => setActiveImage(null)}
+            >
+              ✕
+            </button>
+            
+            <div className="relative max-w-[90vw] max-h-[80vh] flex flex-col items-center select-none" onClick={(e) => e.stopPropagation()}>
+              <img 
+                src={activeImage.url} 
+                alt={activeImage.caption || "Preview"} 
+                className="max-w-full max-h-[70vh] object-contain rounded-lg border border-white/10 shadow-2xl" 
+              />
+              {activeImage.caption && (
+                <p className="text-gray-300 text-sm mt-4 text-center max-w-2xl px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md italic">
+                  {activeImage.caption}
+                </p>
+              )}
             </div>
           </div>
         )}

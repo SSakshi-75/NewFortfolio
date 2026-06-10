@@ -3,6 +3,18 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import Cloudonix from "cloudonix";
+
+// Initialize Cloudonix SDK lazily
+let cloudonixUploader = null;
+const getUploader = () => {
+  if (!cloudonixUploader) {
+    cloudonixUploader = new Cloudonix({
+      api_key: process.env.CLOUDONIX_API_KEY || "dummy_key"
+    });
+  }
+  return cloudonixUploader;
+};
 
 // ─── Disk Storage — files saved to /uploads, deleted after Cloudonix upload ───
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -207,16 +219,60 @@ export const updateResume = async (req, res) => {
   }
 };
 
-// ─── File Upload (saves to disk) ───────
+// ─── File Upload (saves to disk, uploads to Cloudonix, then deletes local copy) ───────
 export const uploadFile = async (req, res) => {
+  let localFilePath = null;
   try {
     if (!req.file) return res.status(400).json({ success: false, message: "No file uploaded." });
 
-    const { filename } = req.file;
-    const type = req.query.type || "image"; // "image", "resume", "screenshot"
+    localFilePath = req.file.path;
+    const type = req.query.type || "image"; // "image", "resume", "screenshot", "cover"
 
-    // Construct local URL for the uploaded file
-    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${filename}`;
+    console.log(`Uploading file ${req.file.originalname} (${req.file.mimetype}) to Cloudonix...`);
+
+    // Convert local file to Blob as required by the Cloudonix SDK
+    const fileBuffer = fs.readFileSync(localFilePath);
+    const blobFile = new Blob([fileBuffer], { type: req.file.mimetype });
+
+    // Upload to Cloudonix
+    const response = await getUploader().upload(blobFile);
+
+    // Delete local temporary file
+    if (localFilePath && fs.existsSync(localFilePath)) {
+      try {
+        fs.unlinkSync(localFilePath);
+      } catch (cleanupErr) {
+        console.error("Error deleting temporary file:", cleanupErr.message);
+      }
+    }
+
+    if (!response.success) {
+      return res.status(500).json({
+        success: false,
+        message: `Cloudonix upload failed: ${response.error || "Unknown SDK error"}`
+      });
+    }
+
+    // Extract path from Cloudonix response structure (both root level and nested 'data' level)
+    const apiData = response.data || {};
+    const innerData = apiData.data || {};
+    const rawPath = apiData.imageUrl || apiData.pdfUrl || apiData.videoUrl || apiData.fileUrl || apiData.url ||
+                    innerData.imageUrl || innerData.pdfUrl || innerData.videoUrl || innerData.fileUrl || innerData.url;
+
+    if (!rawPath) {
+      return res.status(500).json({
+        success: false,
+        message: "No URL returned from Cloudonix upload.",
+        data: response.data
+      });
+    }
+
+    // Convert relative path to absolute URL
+    let fileUrl = rawPath;
+    if (!rawPath.startsWith("http://") && !rawPath.startsWith("https://")) {
+      const storageHost = "https://cloudonix-tb41.onrender.com";
+      fileUrl = rawPath.startsWith("/") ? `${storageHost}${rawPath}` : `${storageHost}/${rawPath}`;
+    }
 
     // Save URL to portfolio based on type
     if (type === "image") {
@@ -232,8 +288,16 @@ export const uploadFile = async (req, res) => {
       await portfolio.save();
     }
 
-    res.json({ success: true, url: fileUrl, message: "File uploaded successfully." });
+    res.json({ success: true, url: fileUrl, message: "File uploaded to Cloudonix successfully." });
   } catch (err) {
+    // Delete local temporary file if error occurs
+    if (localFilePath && fs.existsSync(localFilePath)) {
+      try {
+        fs.unlinkSync(localFilePath);
+      } catch (cleanupErr) {
+        console.error("Cleanup error in catch block:", cleanupErr.message);
+      }
+    }
     res.status(500).json({ success: false, message: err.message });
   }
 };

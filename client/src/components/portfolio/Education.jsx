@@ -3,46 +3,9 @@ import { usePortfolio } from '../../context/PortfolioContext';
 const Education = () => {
   const { portfolio } = usePortfolio();
 
-  const education = portfolio?.education?.length ? portfolio.education : [
-    {
-      degree: 'Bachelor of Computer Applications (BCA)',
-      field: 'Computer Science',
-      institution: 'Institute of Technology and Management, Gorakhpur',
-      period: 'Aug 2023 – Jun 2026',
-      status: 'Completed',
-      grade: '7.0/10 CGPA',
-      color: 'from-blue-500 to-cyan-400',
-      bgColor: 'from-blue-500/10 to-cyan-500/10',
-      icon: '🎓',
-      highlights: ['Data Structures & Algorithms', 'Web Development', 'Database Management Systems', 'Object-Oriented Programming', 'Computer Networks'],
-    },
-    {
-      degree: 'Higher Secondary (12th)',
-      field: 'Science - PCB',
-      institution: 'SKSD Public School',
-      period: '2021 – 2023',
-      status: 'Completed',
-      grade: '%',
-      color: 'from-purple-500 to-pink-400',
-      bgColor: 'from-purple-500/10 to-pink-500/10',
-      icon: '📚',
-      highlights: ['Physics, Chemistry, Biology', 'Computer Science', 'National Level Competitions'],
-    },
-  ];
-
-  const certifications = portfolio?.certifications?.length ? portfolio.certifications : [
-    { name: 'NPM Verified Contributor (2025)', issuer: 'NPM Registry', year: '2025', icon: '🏆' },
-    { name: 'Parampara Fest Technical Award', issuer: 'Institute of Technology & Management', year: '2026', icon: '🏅' },
-    { name: 'Gate Entry System – Production Award', issuer: 'Parampara Fest (7,000+ users)', year: '2026', icon: '🔐' },
-    { name: 'Food Token System – Production Award', issuer: 'Parampara Fest (7,000+ students)', year: '2026', icon: '🍽️' },
-  ];
-
-  const codingStats = portfolio?.codingStats?.length ? portfolio.codingStats : [
-    { label: 'NPM Weekly Downloads', value: '1,400+', icon: '📦' },
-    { label: 'Production Systems', value: '4+', icon: '🚀' },
-    { label: 'Users Served (Fest)', value: '7,000+', icon: '🔥' },
-    { label: 'NPM Packages', value: '2', icon: '🏅' },
-  ];
+  const education = portfolio?.education || [];
+  const certifications = portfolio?.certifications || [];
+  const codingStats = portfolio?.codingStats || [];
 
 
   return (

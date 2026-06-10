@@ -12,6 +12,8 @@ const emptyProject = {
 // ─── Image Manager Component ────────────────────────────────────────────────────
 const ImageManager = ({ screenshots = [], onChange }) => {
   const [uploading, setUploading] = useState(null); // index of uploading image
+  const [bulkUploading, setBulkUploading] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
 
   const addImage = () => {
     onChange([...screenshots, { url: '', caption: '' }]);
@@ -38,7 +40,7 @@ const ImageManager = ({ screenshots = [], onChange }) => {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const res = await fetch(`${API_URL}/api/portfolio/upload?type=screenshot`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
+        credentials: 'include',
         body: formData,
       });
       const data = await res.json();
@@ -51,23 +53,87 @@ const ImageManager = ({ screenshots = [], onChange }) => {
     finally { setUploading(null); }
   };
 
+  const handleBulkUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    
+    // Check file types
+    const invalidFile = files.find(f => !f.type.startsWith('image/'));
+    if (invalidFile) {
+      alert('Only image files are allowed!');
+      return;
+    }
+
+    setBulkUploading(true);
+    setBulkProgress({ current: 0, total: files.length });
+
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const uploadedImages = [];
+
+    // Process files sequentially to avoid Render free tier timeouts and failures
+    for (let i = 0; i < files.length; i++) {
+      setBulkProgress({ current: i + 1, total: files.length });
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      try {
+        const res = await fetch(`${API_URL}/api/portfolio/upload?type=screenshot`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success && data.url) {
+          const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+          uploadedImages.push({ url: data.url, caption: baseName });
+        } else {
+          console.error(`Failed to upload ${file.name}:`, data.message);
+        }
+      } catch (err) {
+        console.error(`Error uploading ${file.name}:`, err);
+      }
+    }
+
+    if (uploadedImages.length > 0) {
+      onChange([...screenshots, ...uploadedImages]);
+    }
+    
+    setBulkUploading(false);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Screenshots with Captions</p>
-        <button
-          type="button"
-          onClick={addImage}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/80 text-white text-xs font-medium hover:bg-blue-500 transition-all cursor-pointer"
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-          Add Image
-        </button>
+        <div className="flex items-center gap-2">
+          <label className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600/80 text-white text-xs font-medium hover:bg-cyan-500 hover:shadow-[0_0_15px_rgba(8,145,178,0.2)] transition-all cursor-pointer ${bulkUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+            {bulkUploading ? `Uploading ${bulkProgress.current}/${bulkProgress.total}...` : 'Upload Multiple'}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleBulkUpload}
+              disabled={bulkUploading}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={addImage}
+            disabled={bulkUploading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/80 text-white text-xs font-medium hover:bg-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            Add Image
+          </button>
+        </div>
       </div>
 
       {screenshots.length === 0 && (
         <p className="text-gray-600 text-xs italic py-3 text-center border border-dashed border-white/[0.08] rounded-xl">
-          No screenshots added yet. Click "Add Image" to start.
+          No screenshots added yet. Click "Add Image" or "Upload Multiple" to start.
         </p>
       )}
 
@@ -77,8 +143,9 @@ const ImageManager = ({ screenshots = [], onChange }) => {
             <span className="text-xs font-semibold text-gray-500">Image #{index + 1}</span>
             <button
               type="button"
+              disabled={bulkUploading || uploading !== null}
               onClick={() => removeImage(index)}
-              className="w-6 h-6 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-all cursor-pointer"
+              className="w-6 h-6 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
@@ -93,27 +160,29 @@ const ImageManager = ({ screenshots = [], onChange }) => {
 
           {/* Upload button or URL input row */}
           <div className="flex gap-2">
-            <label className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border cursor-pointer transition-all whitespace-nowrap ${uploading === index ? 'bg-white/[0.02] border-white/[0.06] text-gray-500 opacity-60' : 'bg-blue-600/70 border-blue-500/30 text-white hover:bg-blue-500/80'}`}>
+            <label className={`relative flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border cursor-pointer transition-all whitespace-nowrap ${(uploading === index || bulkUploading) ? 'bg-white/[0.02] border-white/[0.06] text-gray-500 opacity-60 cursor-not-allowed' : 'bg-blue-600/70 border-blue-500/30 text-white hover:bg-blue-500/80'}`}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
               {uploading === index ? 'Uploading...' : 'Upload'}
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(index, e)} disabled={uploading !== null} />
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(index, e)} disabled={uploading !== null || bulkUploading} />
             </label>
             <input
               type="url"
               value={shot.url || ''}
+              disabled={bulkUploading}
               onChange={(e) => updateImage(index, 'url', e.target.value)}
               placeholder="Or paste image URL..."
-              className="flex-1 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white text-xs placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all min-w-0"
+              className="flex-1 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white text-xs placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all min-w-0 disabled:opacity-50"
             />
           </div>
 
           {/* Caption / Description 2 */}
           <textarea
             value={shot.caption || ''}
+            disabled={bulkUploading}
             onChange={(e) => updateImage(index, 'caption', e.target.value)}
             placeholder="Caption / Description 2 — yeh text image ke neeche dikhega..."
             rows={2}
-            className="w-full px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white text-xs placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all resize-none"
+            className="w-full px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.08] text-white text-xs placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all resize-none disabled:opacity-50"
           />
         </div>
       ))}
@@ -136,7 +205,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const res = await fetch(`${API_URL}/api/portfolio/upload?type=cover`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
+        credentials: 'include',
         body: formData,
       });
       const data = await res.json();

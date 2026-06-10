@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
+  const [activeImage, setActiveImage] = useState(null);
   if (!isOpen || !project) return null;
 
   return (
@@ -90,17 +91,55 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
             <div className="border-t border-gray-200 dark:border-white/[0.08] pt-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Screenshots</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {project.screenshots.map((src, index) => (
-                  <div key={index} className="rounded-xl overflow-hidden border border-gray-200 dark:border-white/[0.05] shadow-sm hover:shadow-md transition-shadow group">
-                    <img src={src} alt={`Screenshot ${index + 1}`} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </div>
-                ))}
+                {project.screenshots.map((shot, index) => {
+                  const url = typeof shot === 'string' ? shot : (shot?.url || '');
+                  const caption = typeof shot === 'string' ? '' : (shot?.caption || '');
+                  if (!url) return null;
+                  return (
+                    <div key={index} className="rounded-xl overflow-hidden border border-gray-200 dark:border-white/[0.05] shadow-sm hover:shadow-md transition-shadow group bg-white/[0.01]">
+                      <div 
+                        className="overflow-hidden w-full h-36 flex items-center justify-center cursor-pointer"
+                        onClick={() => setActiveImage({ url, caption })}
+                      >
+                        <img src={url} alt={caption || `Screenshot ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {activeImage && (
+        <div 
+          className="fixed inset-0 z-[150] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setActiveImage(null)}
+        >
+          <button 
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer text-xl"
+            onClick={() => setActiveImage(null)}
+          >
+            ✕
+          </button>
+          
+          <div className="relative max-w-[90vw] max-h-[80vh] flex flex-col items-center select-none" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={activeImage.url} 
+              alt={activeImage.caption || "Preview"} 
+              className="max-w-full max-h-[70vh] object-contain rounded-lg border border-white/10 shadow-2xl" 
+            />
+            {activeImage.caption && (
+              <p className="text-gray-300 text-sm mt-4 text-center max-w-2xl px-6 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md italic">
+                {activeImage.caption}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

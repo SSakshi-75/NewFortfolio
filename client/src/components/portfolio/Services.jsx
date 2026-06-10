@@ -9,37 +9,6 @@ const defaultIcon = (
 const Services = () => {
   const { portfolio } = usePortfolio();
 
-  const staticServices = [
-    {
-      title: 'Web Development',
-      description: 'Building modern, responsive, and high-performance web applications using cutting-edge technologies like React, Next.js, and Node.js.',
-      icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>,
-      features: ['Single Page Apps', 'Progressive Web Apps', 'Server-Side Rendering', 'API Development'],
-      color: 'from-blue-500 to-cyan-400', bgColor: 'from-blue-500/10 to-cyan-500/10', borderHover: 'hover:border-blue-500/30',
-    },
-    {
-      title: 'UI/UX Design',
-      description: 'Creating intuitive, beautiful user interfaces with a focus on user experience, accessibility, and modern design trends.',
-      icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
-      features: ['Wireframing', 'Prototyping', 'Responsive Design', 'Design Systems'],
-      color: 'from-purple-500 to-pink-400', bgColor: 'from-purple-500/10 to-pink-500/10', borderHover: 'hover:border-purple-500/30',
-    },
-    {
-      title: 'Backend Solutions',
-      description: 'Developing robust, scalable server-side solutions with secure authentication, database management, and cloud deployment.',
-      icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2" /><rect x="2" y="14" width="20" height="8" rx="2" ry="2" /><line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" /></svg>,
-      features: ['REST APIs', 'Database Design', 'Authentication', 'Cloud Deploy'],
-      color: 'from-emerald-500 to-teal-400', bgColor: 'from-emerald-500/10 to-teal-500/10', borderHover: 'hover:border-emerald-500/30',
-    },
-    {
-      title: 'Mobile-First Design',
-      description: 'Ensuring every application looks and performs flawlessly across all devices with responsive layouts and touch-friendly interactions.',
-      icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2" /><line x1="12" y1="18" x2="12.01" y2="18" /></svg>,
-      features: ['Responsive Layouts', 'Touch Optimized', 'Cross-Browser', 'Performance'],
-      color: 'from-orange-500 to-yellow-400', bgColor: 'from-orange-500/10 to-yellow-500/10', borderHover: 'hover:border-orange-500/30',
-    },
-  ];
-
   // Map DB services — add default icon/colors if missing
   const colorPalettes = [
     { color: 'from-blue-500 to-cyan-400', bgColor: 'from-blue-500/10 to-cyan-500/10', borderHover: 'hover:border-blue-500/30' },
@@ -56,7 +25,7 @@ const Services = () => {
         bgColor: s.bgColor || colorPalettes[i % colorPalettes.length].bgColor,
         borderHover: s.borderHover || colorPalettes[i % colorPalettes.length].borderHover,
       }))
-    : staticServices;
+    : [];
 
 
 

@@ -3,34 +3,28 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('admin_token'));
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      verifyToken(token);
-    } else {
-      setChecking(false);
-    }
+    verifyToken();
   }, []);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  const verifyToken = async (t) => {
+  const verifyToken = async () => {
     try {
       const res = await fetch(`${API_URL}/api/auth/verify`, {
-        headers: { Authorization: `Bearer ${t}` },
+        credentials: 'include',
       });
       const data = await res.json();
       if (data.success) {
         setIsLoggedIn(true);
-        setToken(t);
       } else {
-        logout();
+        setIsLoggedIn(false);
       }
     } catch {
-      logout();
+      setIsLoggedIn(false);
     } finally {
       setChecking(false);
     }
@@ -39,37 +33,42 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
     if (data.success) {
-      localStorage.setItem('admin_token', data.token);
-      setToken(data.token);
       setIsLoggedIn(true);
     }
     return data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('admin_token');
-    setToken(null);
+  const logout = async () => {
+    try {
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
     setIsLoggedIn(false);
   };
 
   const authFetch = async (url, options = {}) => {
     return fetch(`${API_URL}${url}`, {
       ...options,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
         ...(options.headers || {}),
       },
     });
   };
 
   return (
-    <AuthContext.Provider value={{ token, isLoggedIn, checking, login, logout, authFetch }}>
+    <AuthContext.Provider value={{ isLoggedIn, checking, login, logout, authFetch }}>
       {children}
     </AuthContext.Provider>
   );

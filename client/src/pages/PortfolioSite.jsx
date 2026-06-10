@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Navbar from '../components/common/Navbar';
 import Home from '../components/portfolio/Home';
 import About from '../components/portfolio/About';
@@ -23,6 +24,15 @@ const LoadingScreen = () => (
 
 const PortfolioSite = () => {
   const { loading } = usePortfolio();
+
+  useEffect(() => {
+    document.title = "Shivam Pandey | Portfolio";
+    const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+    link.type = 'image/svg+xml';
+    link.rel = 'shortcut icon';
+    link.href = '/favicon.svg';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  }, []);
 
   if (loading) return <LoadingScreen />;
 
