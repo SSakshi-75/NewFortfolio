@@ -90,11 +90,23 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
             <div className="border-t border-gray-200 dark:border-white/[0.08] pt-8">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Screenshots</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {project.screenshots.map((src, index) => (
-                  <div key={index} className="rounded-xl overflow-hidden border border-gray-200 dark:border-white/[0.05] shadow-sm hover:shadow-md transition-shadow group">
-                    <img src={src} alt={`Screenshot ${index + 1}`} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </div>
-                ))}
+                {project.screenshots.map((shot, index) => {
+                  const url = typeof shot === 'string' ? shot : shot?.url;
+                  const caption = typeof shot === 'string' ? '' : shot?.caption;
+                  if (!url) return null;
+                  return (
+                    <div key={index} className="relative">
+                      <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-white/[0.05] shadow-sm hover:shadow-md transition-shadow group">
+                        <img src={url} alt={caption || `Screenshot ${index + 1}`} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      {caption && (
+                        <p className="text-gray-500 dark:text-gray-400 text-xs mt-2 text-justify italic px-2">
+                          {caption}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

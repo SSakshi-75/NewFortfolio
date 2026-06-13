@@ -92,7 +92,7 @@ const HeroEditor = () => {
         {/* Profile Photo */}
         <div className="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
           <h3 className="text-gray-900 dark:text-white font-semibold text-sm mb-4">Profile Photo (via Cloudonix)</h3>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
             <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-gray-50 dark:bg-white/[0.03] flex items-center justify-center shrink-0">
               {form.profilePhoto ? (
                 <img src={form.profilePhoto} alt="Profile" className="w-full h-full object-cover" />

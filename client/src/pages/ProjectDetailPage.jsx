@@ -118,32 +118,41 @@ const ProjectDetailPage = () => {
           Back to Projects
         </button>
 
-        {/* Header */}
-        <div className="mb-10">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/[0.05] border border-white/[0.08] text-gray-300">
-              {project.category}
-            </span>
-            {project.period && (
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400">
-                {project.period}
-              </span>
-            )}
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-            {project.title}
-          </h1>
-          <p className="text-gray-300 text-lg leading-relaxed max-w-3xl">
-            {project.description}
-          </p>
-        </div>
+        {/* Top Header & Cover Image Grid */}
+        <div className="grid md:grid-cols-12 gap-8 items-center mb-12">
+          {/* Left: Cover Image Card (Smaller height/width, with decorative corners) */}
+          {project.coverImage && (
+            <div className="md:col-span-5 lg:col-span-4 relative max-w-[320px] mx-auto md:mx-0">
+              <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02] shadow-2xl h-44 sm:h-52">
+                <img src={project.coverImage} alt={project.title} className="w-full h-full object-cover" />
+              </div>
+              
+              {/* Decorative corners */}
+              <div className="absolute -top-3 -right-3 w-16 h-16 border-t-2 border-r-2 border-blue-500/30 rounded-tr-2xl pointer-events-none" />
+              <div className="absolute -bottom-3 -left-3 w-16 h-16 border-b-2 border-l-2 border-cyan-500/30 rounded-bl-2xl pointer-events-none" />
+            </div>
+          )}
 
-        {/* Cover Image */}
-        {project.coverImage && (
-          <div className="mb-10 rounded-2xl overflow-hidden border border-white/[0.06] shadow-2xl">
-            <img src={project.coverImage} alt={project.title} className="w-full h-auto object-cover" />
+          {/* Right: Description & Title */}
+          <div className={`md:col-span-7 ${project.coverImage ? 'lg:col-span-8' : 'lg:col-span-12'} space-y-4`}>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/[0.05] border border-white/[0.08] text-gray-300">
+                {project.category}
+              </span>
+              {project.period && (
+                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                  {project.period}
+                </span>
+              )}
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white">
+              {project.title}
+            </h1>
+            <p className="text-white font-semibold text-base leading-relaxed">
+              {project.description}
+            </p>
           </div>
-        )}
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
           {/* Long Description */}
@@ -156,7 +165,7 @@ const ProjectDetailPage = () => {
                 </h2>
                 <div className="space-y-4">
                   {project.longDescription.split('\n').filter(Boolean).map((para, i) => (
-                    <p key={i} className="text-gray-300 leading-relaxed">{para}</p>
+                    <p key={i} className="text-white font-semibold text-base leading-relaxed">{para}</p>
                   ))}
                 </div>
               </div>
@@ -233,22 +242,22 @@ const ProjectDetailPage = () => {
               <span className="w-1 h-6 rounded-full bg-gradient-to-b from-purple-400 to-pink-400 inline-block" />
               Screenshots
             </h2>
-            <div className="space-y-10">
+            <div className="flex flex-wrap gap-6 justify-center md:justify-start">
               {screenshots.map((shot, index) => {
                 const url = typeof shot === 'string' ? shot : shot?.url;
                 const caption = typeof shot === 'string' ? '' : shot?.caption;
                 if (!url) return null;
                 return (
-                  <div key={index} className="group">
-                    <div className="rounded-2xl overflow-hidden border border-white/[0.06] shadow-xl hover:border-white/[0.1] transition-all duration-300">
+                  <div key={index} className="relative w-full max-w-[320px]">
+                    <div className="relative rounded-2xl overflow-hidden border border-white/[0.06] shadow-xl hover:border-white/[0.1] transition-all duration-300 h-44 sm:h-52">
                       <img
                         src={url}
                         alt={caption || `Screenshot ${index + 1}`}
-                        className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-500"
+                        className="w-full h-full object-cover hover:scale-[1.01] transition-transform duration-500"
                       />
                     </div>
                     {caption && (
-                      <p className="text-gray-400 text-sm mt-3 text-center italic px-4">
+                      <p className="text-gray-400 text-xs mt-2 text-justify italic px-2">
                         {caption}
                       </p>
                     )}
