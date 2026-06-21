@@ -92,6 +92,7 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Screenshots</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {project.screenshots.map((shot, index) => {
+<<<<<<< HEAD
                   const url = typeof shot === 'string' ? shot : (shot?.url || '');
                   const caption = typeof shot === 'string' ? '' : (shot?.caption || '');
                   if (!url) return null;
@@ -103,6 +104,21 @@ const ProjectDetailsModal = ({ project, isOpen, onClose }) => {
                       >
                         <img src={url} alt={caption || `Screenshot ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       </div>
+=======
+                  const url = typeof shot === 'string' ? shot : shot?.url;
+                  const caption = typeof shot === 'string' ? '' : shot?.caption;
+                  if (!url) return null;
+                  return (
+                    <div key={index} className="relative">
+                      <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-white/[0.05] shadow-sm hover:shadow-md transition-shadow group">
+                        <img src={url} alt={caption || `Screenshot ${index + 1}`} className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      {caption && (
+                        <p className="text-gray-500 dark:text-gray-400 text-xs mt-2 text-justify italic px-2">
+                          {caption}
+                        </p>
+                      )}
+>>>>>>> 1aa549e590252e071fb483bb5d147d80df811015
                     </div>
                   );
                 })}

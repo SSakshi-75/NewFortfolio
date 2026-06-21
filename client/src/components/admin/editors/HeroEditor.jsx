@@ -100,6 +100,7 @@ const HeroEditor = () => {
     <div className="space-y-6">
       <SectionHeader title="Hero / Home Section" subtitle="Portfolio ka main page edit karo" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>} />
       
+<<<<<<< HEAD
       {/* 1. Profile Photo Card */}
       <div className="p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06] space-y-4">
         <div className="flex items-center justify-between">
@@ -130,6 +131,31 @@ const HeroEditor = () => {
             {form.profilePhoto && (
               <input type="text" value={form.profilePhoto} onChange={(e) => updateField('profilePhoto', e.target.value)} className="mt-2 w-full text-xs px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-400 focus:outline-none" placeholder="Ya direct URL daalo" />
             )}
+=======
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Profile Photo */}
+        <div className="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-white/[0.02] border border-gray-200 dark:border-white/[0.06]">
+          <h3 className="text-gray-900 dark:text-white font-semibold text-sm mb-4">Profile Photo (via Cloudonix)</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 bg-gray-50 dark:bg-white/[0.03] flex items-center justify-center shrink-0">
+              {form.profilePhoto ? (
+                <img src={form.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" /></svg>
+              )}
+            </div>
+            <div>
+              <label className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-900 dark:text-white font-medium text-sm bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-200 dark:hover:bg-gray-200 dark:bg-white/[0.08] transition-all cursor-pointer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                {uploading ? 'Uploading...' : 'Upload Photo'}
+                <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploading} />
+              </label>
+              <p className="text-gray-600 text-xs mt-2">Cloudonix se cloud pe upload hogi</p>
+              {form.profilePhoto && (
+                <input type="text" value={form.profilePhoto} onChange={(e) => updateField('profilePhoto', e.target.value)} className="mt-2 w-full text-xs px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-400 focus:outline-none" placeholder="Ya direct URL daalo" />
+              )}
+            </div>
+>>>>>>> 1aa549e590252e071fb483bb5d147d80df811015
           </div>
         </div>
       </div>

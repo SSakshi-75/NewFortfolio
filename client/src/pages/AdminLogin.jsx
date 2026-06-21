@@ -93,7 +93,7 @@ const AdminLogin = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   onFocus={() => setFocused('email')}
                   onBlur={() => setFocused(null)}
-                  placeholder="admin@shivam.dev"
+                  placeholder="Enter admin email"
                   className="w-full px-4 py-3.5 bg-transparent text-gray-900 dark:text-white text-sm placeholder-gray-600 focus:outline-none"
                   required
                 />

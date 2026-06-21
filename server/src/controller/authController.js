@@ -7,21 +7,6 @@ import { getDefaultPortfolioData } from "../utils/defaultData.js";
 // ─── Seed Admin + Portfolio if not exists ────────────────────────────────────
 export const seedAdmin = async () => {
   try {
-    // Always ensure admin exists with correct password
-    const existing = await Admin.findOne({ email: process.env.ADMIN_EMAIL });
-    const hashedPwd = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
-    if (!existing) {
-      await Admin.create({
-        email: process.env.ADMIN_EMAIL,
-        password: hashedPwd,
-      });
-      console.log("✅ Admin seeded:", process.env.ADMIN_EMAIL);
-    } else {
-      // Force update password hash
-      await Admin.findByIdAndUpdate(existing._id, { password: hashedPwd });
-      console.log("✅ Admin password verified:", process.env.ADMIN_EMAIL);
-    }
-
     const portfolioDoc = await Portfolio.findOne();
     if (!portfolioDoc) {
       await Portfolio.create(getDefaultPortfolioData());
